@@ -16,3 +16,10 @@ class DemandCreate(DemandBase):
 
 class DemandUpdate(DemandBase):
     pass
+
+
+class EventCreate(BaseModel):
+    source: str
+    type: str
+    value: str
+    created_at: str

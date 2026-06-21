@@ -3,60 +3,108 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel de Demandas e Ações</title>
+    <title>Central Escolar</title>
     <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
     <header class="container">
-        <h1>Painel de Demandas e Ações</h1>
+        <h1>Central Escolar</h1>
+
         <p>
-            Base comum do projeto de extensão: cadastro, acompanhamento e resumo de demandas.
+            Sistema de controle de demandas e eventos escolares.
         </p>
     </header>
 
     <main class="container">
+
         <section class="card">
-            <h2>Cadastrar demanda</h2>
+            <h2>Cadastrar Demanda</h2>
 
             <form id="demand-form">
+
                 <label for="title">Título</label>
-                <input id="title" name="title" type="text" required />
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                />
 
                 <label for="category">Categoria</label>
-                <input id="category" name="category" type="text" required />
+                <input
+                    id="category"
+                    name="category"
+                    type="text"
+                    required
+                />
 
                 <label for="description">Descrição</label>
-                <textarea id="description" name="description" required></textarea>
+                <textarea
+                    id="description"
+                    name="description"
+                    required
+                ></textarea>
 
                 <label for="status">Status</label>
-                <select id="status" name="status" required>
-                    <option value="pendente">Pendente</option>
-                    <option value="em andamento">Em andamento</option>
-                    <option value="concluída">Concluída</option>
+                <select
+                    id="status"
+                    name="status"
+                    required
+                >
+                    <option value="pendente">
+                        Pendente
+                    </option>
+
+                    <option value="em andamento">
+                        Em andamento
+                    </option>
+
+                    <option value="concluída">
+                        Concluída
+                    </option>
                 </select>
 
                 <label for="owner">Responsável</label>
-                <input id="owner" name="owner" type="text" required />
+                <input
+                    id="owner"
+                    name="owner"
+                    type="text"
+                    required
+                />
 
                 <label for="created_at">Data</label>
-                <input id="created_at" name="created_at" type="date" required />
+                <input
+                    id="created_at"
+                    name="created_at"
+                    type="date"
+                    required
+                />
 
-                <button type="submit">Salvar demanda</button>
+                <button type="submit">
+                    Salvar Demanda
+                </button>
+
             </form>
         </section>
 
         <section class="card">
             <h2>Resumo</h2>
+
             <div id="summary-box">
                 Carregue os dados para visualizar o resumo.
             </div>
         </section>
 
         <section class="card">
-            <h2>Demandas cadastradas</h2>
-            <button id="load-demands-btn" type="button">
-                Carregar demandas
+
+            <h2>Demandas Cadastradas</h2>
+
+            <button
+                id="load-demands-btn"
+                type="button"
+            >
+                Carregar Demandas
             </button>
 
             <div id="status-box">
@@ -64,11 +112,25 @@
             </div>
 
             <ul id="demand-list"></ul>
+
         </section>
+
+        <section class="card">
+
+            <h2>Eventos Recebidos</h2>
+
+            <ul id="event-list">
+                <li>Nenhum evento recebido.</li>
+            </ul>
+
+        </section>
+
     </main>
 
     <footer class="container">
-        <p>ETAPA 2 - Plano de Ação em Prática</p>
+        <p>
+            ETAPA 3 - Culminância Produto Final
+        </p>
     </footer>
 
     <script src="./app.js"></script>

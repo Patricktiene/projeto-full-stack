@@ -14,6 +14,7 @@ def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with get_connection() as connection:
+
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS demands (
@@ -28,12 +29,33 @@ def init_db():
             """
         )
 
-        count = connection.execute("SELECT COUNT(*) FROM demands").fetchone()[0]
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source TEXT NOT NULL,
+                type TEXT NOT NULL,
+                value TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+
+        count = connection.execute(
+            "SELECT COUNT(*) FROM demands"
+        ).fetchone()[0]
 
         if count == 0:
             connection.executemany(
                 """
-                INSERT INTO demands (title, category, description, status, owner, created_at)
+                INSERT INTO demands (
+                    title,
+                    category,
+                    description,
+                    status,
+                    owner,
+                    created_at
+                )
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 [
@@ -63,18 +85,31 @@ def init_db():
                     ),
                 ],
             )
+
             connection.commit()
 
+
+# -------------------------
+# DEMANDS
+# -------------------------
 
 def list_demands():
     with get_connection() as connection:
         rows = connection.execute(
             """
-            SELECT id, title, category, description, status, owner, created_at
+            SELECT
+                id,
+                title,
+                category,
+                description,
+                status,
+                owner,
+                created_at
             FROM demands
             ORDER BY id
             """
         ).fetchall()
+
         return [dict(row) for row in rows]
 
 
@@ -82,62 +117,139 @@ def get_demand_by_id(demand_id: int):
     with get_connection() as connection:
         row = connection.execute(
             """
-            SELECT id, title, category, description, status, owner, created_at
+            SELECT
+                id,
+                title,
+                category,
+                description,
+                status,
+                owner,
+                created_at
             FROM demands
             WHERE id = ?
             """,
             (demand_id,),
         ).fetchone()
+
         return dict(row) if row else None
 
 
-def create_demand(title, category, description, status, owner, created_at):
+def create_demand(
+    title,
+    category,
+    description,
+    status,
+    owner,
+    created_at,
+):
     with get_connection() as connection:
         cursor = connection.execute(
             """
-            INSERT INTO demands (title, category, description, status, owner, created_at)
+            INSERT INTO demands (
+                title,
+                category,
+                description,
+                status,
+                owner,
+                created_at
+            )
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (title, category, description, status, owner, created_at),
+            (
+                title,
+                category,
+                description,
+                status,
+                owner,
+                created_at,
+            ),
         )
+
         connection.commit()
+
         return get_demand_by_id(cursor.lastrowid)
 
 
-def update_demand(demand_id, title, category, description, status, owner, created_at):
+def update_demand(
+    demand_id,
+    title,
+    category,
+    description,
+    status,
+    owner,
+    created_at,
+):
     with get_connection() as connection:
         connection.execute(
             """
             UPDATE demands
-            SET title = ?, category = ?, description = ?, status = ?, owner = ?, created_at = ?
+            SET
+                title = ?,
+                category = ?,
+                description = ?,
+                status = ?,
+                owner = ?,
+                created_at = ?
             WHERE id = ?
             """,
-            (title, category, description, status, owner, created_at, demand_id),
+            (
+                title,
+                category,
+                description,
+                status,
+                owner,
+                created_at,
+                demand_id,
+            ),
         )
+
         connection.commit()
+
         return get_demand_by_id(demand_id)
 
 
 def delete_demand(demand_id):
     with get_connection() as connection:
         connection.execute(
-            "DELETE FROM demands WHERE id = ?",
+            """
+            DELETE FROM demands
+            WHERE id = ?
+            """,
             (demand_id,),
         )
+
         connection.commit()
 
 
 def get_summary():
     with get_connection() as connection:
-        total = connection.execute("SELECT COUNT(*) FROM demands").fetchone()[0]
+
+        total = connection.execute(
+            "SELECT COUNT(*) FROM demands"
+        ).fetchone()[0]
+
         pending = connection.execute(
-            "SELECT COUNT(*) FROM demands WHERE status = 'pendente'"
+            """
+            SELECT COUNT(*)
+            FROM demands
+            WHERE status = 'pendente'
+            """
         ).fetchone()[0]
+
         in_progress = connection.execute(
-            "SELECT COUNT(*) FROM demands WHERE status = 'em andamento'"
+            """
+            SELECT COUNT(*)
+            FROM demands
+            WHERE status = 'em andamento'
+            """
         ).fetchone()[0]
+
         done = connection.execute(
-            "SELECT COUNT(*) FROM demands WHERE status = 'concluída'"
+            """
+            SELECT COUNT(*)
+            FROM demands
+            WHERE status = 'concluída'
+            """
         ).fetchone()[0]
 
         return {
@@ -146,3 +258,76 @@ def get_summary():
             "in_progress": in_progress,
             "done": done,
         }
+
+
+# -------------------------
+# EVENTS
+# -------------------------
+
+def get_event_by_id(event_id: int):
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT
+                id,
+                source,
+                type,
+                value,
+                created_at
+            FROM events
+            WHERE id = ?
+            """,
+            (event_id,),
+        ).fetchone()
+
+        return dict(row) if row else None
+
+
+def create_event(
+    source,
+    type,
+    value,
+    created_at,
+):
+    with get_connection() as connection:
+
+        cursor = connection.execute(
+            """
+            INSERT INTO events (
+                source,
+                type,
+                value,
+                created_at
+            )
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                source,
+                type,
+                value,
+                created_at,
+            ),
+        )
+
+        connection.commit()
+
+        return get_event_by_id(cursor.lastrowid)
+
+
+def list_events():
+    with get_connection() as connection:
+
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                source,
+                type,
+                value,
+                created_at
+            FROM events
+            ORDER BY id DESC
+            """
+        ).fetchall()
+
+        return [dict(row) for row in rows]

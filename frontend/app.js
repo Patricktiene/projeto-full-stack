@@ -1,26 +1,58 @@
 const form = document.getElementById("demand-form");
-const loadButton = document.getElementById("load-demands-btn");
-const statusBox = document.getElementById("status-box");
-const summaryBox = document.getElementById("summary-box");
-const demandList = document.getElementById("demand-list");
+
+const loadButton =
+    document.getElementById("load-demands-btn");
+
+const statusBox =
+    document.getElementById("status-box");
+
+const summaryBox =
+    document.getElementById("summary-box");
+
+const demandList =
+    document.getElementById("demand-list");
+
+const eventList =
+    document.getElementById("event-list");
 
 const API_BASE = "http://localhost:8000";
 
 
 async function fetchDemands() {
-    const response = await fetch(`${API_BASE}/demands`);
-    const data = await response.json();
+
+    const response =
+        await fetch(`${API_BASE}/demands`);
+
+    const data =
+        await response.json();
+
     return data.demands;
 }
 
 
 async function fetchSummary() {
-    const response = await fetch(`${API_BASE}/summary`);
+
+    const response =
+        await fetch(`${API_BASE}/summary`);
+
     return await response.json();
 }
 
 
+async function fetchEvents() {
+
+    const response =
+        await fetch(`${API_BASE}/events`);
+
+    const data =
+        await response.json();
+
+    return data.events;
+}
+
+
 function renderSummary(summary) {
+
     summaryBox.innerHTML = `
         <strong>Total:</strong> ${summary.total}<br>
         <strong>Pendentes:</strong> ${summary.pending}<br>
@@ -31,15 +63,21 @@ function renderSummary(summary) {
 
 
 function renderDemands(demands) {
+
     demandList.innerHTML = "";
 
     if (!demands || demands.length === 0) {
-        demandList.innerHTML = "<li>Nenhuma demanda encontrada.</li>";
+
+        demandList.innerHTML =
+            "<li>Nenhuma demanda encontrada.</li>";
+
         return;
     }
 
     demands.forEach((demand) => {
-        const item = document.createElement("li");
+
+        const item =
+            document.createElement("li");
 
         item.innerHTML = `
             <strong>${demand.title}</strong><br>
@@ -47,8 +85,11 @@ function renderDemands(demands) {
             Descrição: ${demand.description}<br>
             Status: ${demand.status}<br>
             Responsável: ${demand.owner}<br>
-            Data: ${demand.created_at}<br>
-            <button onclick="removeDemand(${demand.id})">Excluir</button>
+            Data: ${demand.created_at}<br><br>
+
+            <button onclick="removeDemand(${demand.id})">
+                Excluir
+            </button>
         `;
 
         demandList.appendChild(item);
@@ -56,68 +97,150 @@ function renderDemands(demands) {
 }
 
 
+function renderEvents(events) {
+
+    eventList.innerHTML = "";
+
+    if (!events || events.length === 0) {
+
+        eventList.innerHTML =
+            "<li>Nenhum evento recebido.</li>";
+
+        return;
+    }
+
+    events.forEach((event) => {
+
+        const item =
+            document.createElement("li");
+
+        item.innerHTML = `
+            <strong>${event.source}</strong><br>
+            Tipo: ${event.type}<br>
+            Valor: ${event.value}<br>
+            Data: ${event.created_at}
+        `;
+
+        eventList.appendChild(item);
+    });
+}
+
+
 async function loadAllData() {
-    statusBox.textContent = "Carregando demandas...";
+
+    statusBox.textContent =
+        "Carregando dados...";
 
     try {
-        const demands = await fetchDemands();
-        const summary = await fetchSummary();
+
+        const demands =
+            await fetchDemands();
+
+        const summary =
+            await fetchSummary();
+
+        const events =
+            await fetchEvents();
 
         renderDemands(demands);
+
         renderSummary(summary);
 
-        statusBox.textContent = `Foram carregadas ${demands.length} demandas.`;
+        renderEvents(events);
+
+        statusBox.textContent =
+            `Foram carregadas ${demands.length} demandas.`;
+
     } catch (error) {
+
         statusBox.textContent =
             "Erro ao carregar os dados. Verifique se a API está em execução.";
+
         console.error(error);
     }
 }
 
 
 async function createDemand(event) {
+
     event.preventDefault();
 
     const newDemand = {
-        title: document.getElementById("title").value,
-        category: document.getElementById("category").value,
-        description: document.getElementById("description").value,
-        status: document.getElementById("status").value,
-        owner: document.getElementById("owner").value,
-        created_at: document.getElementById("created_at").value,
+        title:
+            document.getElementById("title").value,
+
+        category:
+            document.getElementById("category").value,
+
+        description:
+            document.getElementById("description").value,
+
+        status:
+            document.getElementById("status").value,
+
+        owner:
+            document.getElementById("owner").value,
+
+        created_at:
+            document.getElementById("created_at").value,
     };
 
     try {
-        await fetch(`${API_BASE}/demands`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newDemand),
-        });
+
+        await fetch(
+            `${API_BASE}/demands`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newDemand),
+            }
+        );
 
         form.reset();
+
         await loadAllData();
+
     } catch (error) {
-        statusBox.textContent = "Erro ao cadastrar demanda.";
+
+        statusBox.textContent =
+            "Erro ao cadastrar demanda.";
+
         console.error(error);
     }
 }
 
 
 async function removeDemand(id) {
+
     try {
-        await fetch(`${API_BASE}/demands/${id}`, {
-            method: "DELETE",
-        });
+
+        await fetch(
+            `${API_BASE}/demands/${id}`,
+            {
+                method: "DELETE",
+            }
+        );
 
         await loadAllData();
+
     } catch (error) {
-        statusBox.textContent = "Erro ao excluir demanda.";
+
+        statusBox.textContent =
+            "Erro ao excluir demanda.";
+
         console.error(error);
     }
 }
 
 
-form.addEventListener("submit", createDemand);
-loadButton.addEventListener("click", loadAllData);
+form.addEventListener(
+    "submit",
+    createDemand
+);
+
+loadButton.addEventListener(
+    "click",
+    loadAllData
+);
